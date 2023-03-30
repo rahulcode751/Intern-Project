@@ -4,7 +4,7 @@ const addProduct = new mongoose.Schema(
     {
         title: {
             type: String,
-            required: [true, 'Please add a title'],
+            // required: [true, 'Please add a title'],
         },
         description: {
             type: String,
@@ -34,7 +34,9 @@ const addProduct = new mongoose.Schema(
             // required: [true, 'Please add a catogory'],
         },
         image: {
-            type: [String],
+            type: String
+            // data: Buffer,
+            // ContentType: [String],
             // required: [true, 'Please add a Image'],
         },
         specifications: {

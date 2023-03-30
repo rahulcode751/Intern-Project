@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
 const connectDB = require("./config/db");
-// const fileupload = require('express-fileupload')
+// const fileUpload = require('express-fileupload');
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const addProductModal = require('./modals/addProductModal');
@@ -15,6 +15,7 @@ connectDB();
 
 const app = express();
 
+// app.use(fileUpload());
 app.use(express.json());
 app.use(cookieParser());
 if (process.env.NODE_ENV === 'development') {
@@ -82,9 +83,13 @@ app.get('/terms-cond', (req, res) => {
 app.get('/addProduct', (req, res) => {
     res.sendFile(addProductHtml);
 });
+
 // Post addproduct Page admin only
-app.post('/addProduct', upload.array('image[]'), async (req, res) => {
-    let ProductSub = new addProductModal({
+app.post('/addProduct', upload.array('image', 10), async (req, res) => {
+    // console.log(req.body);
+    console.log(req.files)
+    // let ProductSub = new addProductModal({
+    let ProductSub = {
         title: req.body.title,
         description: req.body.description,
         price: {
@@ -103,7 +108,8 @@ app.post('/addProduct', upload.array('image[]'), async (req, res) => {
             features: req.body.features
         },
         offers: req.body.offers
-    })
+    }
+    //})
     if (req.files) {
         let path = ''
         req.files.forEach(function (files, index, arr) {
@@ -112,13 +118,22 @@ app.post('/addProduct', upload.array('image[]'), async (req, res) => {
         path = path.substring(0, path.lastIndexOf(","))
         ProductSub.image = path
     }
-    console.log(ProductSub);
-    ProductSub.save()
+    else {
+        console.log("files are not present")
+    }
+    // console.log(ProductSub);
+    const product = await addProductModal.create(ProductSub);
+    console.log(product)
+    product.save()
         .then(response => {
             res.sendFile(filepath)
+            // res.redirect('/')
         })
         .catch(error => {
-            res.sendFile(addProductHtml)
+            console.log("database me nahi gya")
+            res.sendFile(filepath)
+            // res.sendFile(addProductHtml)
+            // res.redirect('/addProduct')
         })
 })
 
