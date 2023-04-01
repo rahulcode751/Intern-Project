@@ -40,6 +40,7 @@ const producthtml = path.resolve(__dirname, "views", "product.html");
 const faqhtml = path.resolve(__dirname, "views", "faq.html");
 const termcondhtml = path.resolve(__dirname, "views", "terms_conditions.html");
 const addProductHtml = path.resolve(__dirname, "views", "admin-product-update.html");
+const addFaqHtml = path.resolve(__dirname, "views", "admin-faq.html");
 
 // Mount router
 // Get Home page
@@ -137,12 +138,21 @@ app.post('/addProduct', upload.array('image', 10), async (req, res) => {
             // res.redirect('/addProduct')
         })
 })
+
+// Add faq viw
+app.get('/addFaq', (req, res) => {
+    res.sendFile(addFaqHtml);
+});
 // Add Faq
 app.post('/addFaq', async (req, res) => {
     var faq = await addFaqModal.findOne({ category: req.body.category });
     if (faq == null || faq.category != req.body.category) {
-        var quesBody = [req.body.quesBody];
         var category = req.body.category;
+        var question = req.body.question;
+        var answer = req.body.answer;
+        var blog = req.body.answer;
+        var youtube = req.body.youtube;
+        var quesBody = [{ question, answer, blog, youtube }];
         var ans = {
             category,
             quesBody
@@ -152,12 +162,20 @@ app.post('/addFaq', async (req, res) => {
     }
     else {
         var ques_body = faq.quesBody;
-        ques_body.push(req.body.quesBody);
+        console.log(ques_body)
+        var category = req.body.category;
+        var question = req.body.question;
+        var answer = req.body.answer;
+        var blog = req.body.answer;
+        var youtube = req.body.youtube;
+        var quesBody1 = { question, answer, blog, youtube };
+        ques_body.push(quesBody1);
         var data = await addFaqModal.deleteMany({ category: req.body.category });
         var insertData = await addFaqModal.create({ category: req.body.category, quesBody: ques_body });
-        console.log(insertData);
+        // console.log(insertData);
     }
-    res.status(200).json({ success: true });
+    // res.status(200).json({ success: true });
+    res.sendFile(addFaqHtml)
 });
 
 const PORT = process.env.PORT || 5501;
