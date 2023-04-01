@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser')
 const addProductModal = require('./modals/addProductModal');
 const EnquiryForm = require("./modals/EnquiryFormModal");
 const upload = require('./Middleware/upload');
+const addFaqModal = require("./modals/addFaqModal");
 bodyParser = require('body-parser');
 dotenv.config({ path: "./config/config.env" });
 
@@ -136,7 +137,28 @@ app.post('/addProduct', upload.array('image', 10), async (req, res) => {
             // res.redirect('/addProduct')
         })
 })
-
+// Add Faq
+app.post('/addFaq', async (req, res) => {
+    var faq = await addFaqModal.findOne({ category: req.body.category });
+    if (faq == null || faq.category != req.body.category) {
+        var quesBody = [req.body.quesBody];
+        var category = req.body.category;
+        var ans = {
+            category,
+            quesBody
+        }
+        const FaqData = await addFaqModal.create(ans);
+        console.log(FaqData);
+    }
+    else {
+        var ques_body = faq.quesBody;
+        ques_body.push(req.body.quesBody);
+        var data = await addFaqModal.deleteMany({ category: req.body.category });
+        var insertData = await addFaqModal.create({ category: req.body.category, quesBody: ques_body });
+        console.log(insertData);
+    }
+    res.status(200).json({ success: true });
+});
 
 const PORT = process.env.PORT || 5501;
 
