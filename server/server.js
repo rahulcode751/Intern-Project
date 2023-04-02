@@ -2,27 +2,34 @@ const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
 const connectDB = require("./config/db");
-// const fileUpload = require('express-fileupload');
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const addProductModal = require('./modals/addProductModal');
 const EnquiryForm = require("./modals/EnquiryFormModal");
 const upload = require('./Middleware/upload');
 const addFaqModal = require("./modals/addFaqModal");
-bodyParser = require('body-parser');
+const addTandCModal = require("./modals/addTandCModal");
+const bodyParser = require('body-parser');
+const errorHandler = require('./Middleware/error')
+
 dotenv.config({ path: "./config/config.env" });
+
+const { protect, authorize } = require('./Middleware/auth');
+
+// Router
+const auth = require('./routes/auth')
 
 connectDB();
 
 const app = express();
 
-// app.use(fileUpload());
 app.use(express.json());
+
 app.use(cookieParser());
+
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
-// app.use(fileupload());
 app.use(
     bodyParser.urlencoded({
         extended: true,
@@ -40,10 +47,14 @@ const producthtml = path.resolve(__dirname, "views", "product.html");
 const faqhtml = path.resolve(__dirname, "views", "faq.html");
 const termcondhtml = path.resolve(__dirname, "views", "terms_conditions.html");
 const addProductHtml = path.resolve(__dirname, "views", "admin-product-update.html");
+const addFaqHtml = path.resolve(__dirname, "views", "admin-faq.html");
+const addtandChtml = path.resolve(__dirname, "views", 'admin-tandc.html')
 
 // Mount router
+app.use('/auth', auth);
+
 // Get Home page
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
     res.set({
         "Allow-access-Allow-Origin": "*",
     });
@@ -65,31 +76,29 @@ app.post("/", async (req, res) => {
 });
 
 // get product page
-app.get('/product', (req, res) => {
+app.get('/product', async (req, res) => {
     res.sendFile(producthtml);
 });
 
 // get Faq Page
-app.get('/faq', (req, res) => {
+app.get('/faq', async (req, res) => {
     res.sendFile(faqhtml);
 });
 
 // Get T&C Page
-app.get('/terms-cond', (req, res) => {
+app.get('/terms-cond', async (req, res) => {
     console.log(req.body);
     res.sendFile(termcondhtml);
 });
 
 // Get addproduct Page admin only
-app.get('/addProduct', (req, res) => {
+app.get('/addProduct', async (req, res) => {
     res.sendFile(addProductHtml);
 });
 
 // Post addproduct Page admin only
 app.post('/addProduct', upload.array('image', 10), async (req, res) => {
-    // console.log(req.body);
     console.log(req.files)
-    // let ProductSub = new addProductModal({
     let ProductSub = {
         title: req.body.title,
         description: req.body.description,
@@ -122,27 +131,32 @@ app.post('/addProduct', upload.array('image', 10), async (req, res) => {
     else {
         console.log("files are not present")
     }
-    // console.log(ProductSub);
     const product = await addProductModal.create(ProductSub);
     console.log(product)
     product.save()
         .then(response => {
             res.sendFile(filepath)
-            // res.redirect('/')
         })
         .catch(error => {
             console.log("database me nahi gya")
-            res.sendFile(filepath)
-            // res.sendFile(addProductHtml)
-            // res.redirect('/addProduct')
+            res.sendFile(addProductHtml)
         })
 })
+
+// Add faq viw
+app.get('/addFaq', async (req, res) => {
+    res.sendFile(addFaqHtml);
+});
 // Add Faq
 app.post('/addFaq', async (req, res) => {
     var faq = await addFaqModal.findOne({ category: req.body.category });
     if (faq == null || faq.category != req.body.category) {
-        var quesBody = [req.body.quesBody];
         var category = req.body.category;
+        var question = req.body.question;
+        var answer = req.body.answer;
+        var blog = req.body.answer;
+        var youtube = req.body.youtube;
+        var quesBody = [{ question, answer, blog, youtube }];
         var ans = {
             category,
             quesBody
@@ -152,13 +166,38 @@ app.post('/addFaq', async (req, res) => {
     }
     else {
         var ques_body = faq.quesBody;
-        ques_body.push(req.body.quesBody);
+        console.log(ques_body)
+        var category = req.body.category;
+        var question = req.body.question;
+        var answer = req.body.answer;
+        var blog = req.body.answer;
+        var youtube = req.body.youtube;
+        var quesBody1 = { question, answer, blog, youtube };
+        ques_body.push(quesBody1);
         var data = await addFaqModal.deleteMany({ category: req.body.category });
         var insertData = await addFaqModal.create({ category: req.body.category, quesBody: ques_body });
-        console.log(insertData);
+        // console.log(insertData);
     }
-    res.status(200).json({ success: true });
+    // res.status(200).json({ success: true });
+    res.sendFile(addFaqHtml)
 });
+
+// View T and C
+app.get('/addTandC', async (req, res) => {
+    res.sendFile(addtandChtml);
+});
+
+// Post T and C
+app.post('/addTandC', async (req, res) => {
+    const data = await addTandCModal.deleteMany({});
+    const insertdata = await addTandCModal.create({ payment: req.body.payment, shipment: req.body.shipment, TandC: req.body.TandC })
+    console.log(insertdata);
+    res.sendFile(addtandChtml);
+    // res.status(200).json({ success: true })
+});
+
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 5501;
 
