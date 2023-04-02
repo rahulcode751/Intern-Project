@@ -193,6 +193,7 @@ app.post('/addTandC', async (req, res) => {
     const insertdata = await addTandCModal.create({ payment: req.body.payment, shipment: req.body.shipment, TandC: req.body.TandC })
     console.log(insertdata);
     res.sendFile(addtandChtml);
+
     // res.status(200).json({ success: true })
 });
 
