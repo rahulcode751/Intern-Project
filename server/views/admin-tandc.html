@@ -13,7 +13,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="styles/admin-faq.css" />
+    <link rel="stylesheet" href="styles/admin-tandc.css" />
     <script
       src="https://kit.fontawesome.com/a076d05399.js"
       crossorigin="anonymous"
@@ -37,9 +37,9 @@
       </div>
       <ul class="nav-links">
         <!-- <li><a href="/">Home</a></li>
-          <li><a href="faq">Faq</a></li>
-          <li><a href="product">Product</a></li>
-          <li><button class="login-button" href="terms-cond">T&C</button></li> -->
+            <li><a href="faq">Faq</a></li>
+            <li><a href="product">Product</a></li>
+            <li><button class="login-button" href="terms-cond">T&C</button></li> -->
         <li><a href="/log">Login/Signup</a></li>
         <li><a href="/addFaq">Add Faq</a></li>
         <li><a href="/addProduct">Add Product</a></li>
@@ -50,44 +50,34 @@
     <main>
       <section class="admin_panel" id="admin_panel">
         <div class="admin-head">
-          <span class="heading">FAQ form</span>
+          <span class="heading">Payment , Shipping & T&C </span>
         </div>
         <div class="admin">
-          <form action="/addFaq" method="POST">
+          <form action="/addTandC" method="POST">
             <div class="field">
-              <label for="category">Category</label>
-              <input type="text" name="category" id="category" required />
-            </div>
-            <div class="field">
-              <label for="question">Question</label>
+              <label for="payment">Payment</label>
               <textarea
-                name="question"
-                id="question"
+                name="payment"
+                id="payment"
                 cols="30"
-                rows="2"
-                required
+                rows="3"
               ></textarea>
-              <!-- <input type="text" id="question" name="question" required /> -->
+              <!-- <input type="text" name="payment" id="payment" required /> -->
             </div>
             <div class="field">
-              <label for="answer">Answer</label>
+              <label for="shipment">Shipment</label>
               <textarea
-                name="answer"
-                id="answer"
+                name="shipment"
+                id="shipment"
                 cols="30"
-                rows="5"
-                required
+                rows="3"
               ></textarea>
-              <!-- <input type="text" name="answer" id="answer" required /> -->
+              <!-- <input type="text" id="shipment" name="shipment" required /> -->
             </div>
             <div class="field">
-              <label for="blog">Blog</label>
-              <textarea name="blog" id="blog" cols="30" rows="10"></textarea>
-              <!-- <input type="text" name="blog" id="blog" /> -->
-            </div>
-            <div class="field">
-              <label for="youtube">Youtube</label>
-              <input type="text" name="youtube" id="youtube" />
+              <label for="TandC">T&C</label>
+              <textarea name="TandC" id="TandC" cols="30" rows="3"></textarea>
+              <!-- <input type="text" name="termsC" id="termsC" required /> -->
             </div>
 
             <button type="submit">Submit</button>
